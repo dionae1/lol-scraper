@@ -30,11 +30,22 @@ class LeagueofgraphsSpider(CrawlSpider):
         ),
     )
 
+    def __init__(self):
+        super().__init__()
+        self.id_set = set()
+
     def parse_profile(self, response):
         profile = response.css("h1.bg-black::text").get()
 
         rows = response.xpath("//table[contains(@class,'recentGamesTable')]//tr[td]")
         for row in rows:
+            match_id = row.css("a::attr(href)").get()
+            match_id = match_id.split("/")[-1].split("#")[0] if match_id else None
+
+            if not match_id or match_id in self.id_set:
+                continue
+
+            self.id_set.add(match_id)
             gamemode = row.css("div.gameMode::text").get()
             if not gamemode or "Soloqueue" not in gamemode:
                 continue
@@ -53,7 +64,7 @@ class LeagueofgraphsSpider(CrawlSpider):
             ).getall()
 
             yield {
-                "player": profile,
+                "match_id": match_id,
                 "winner": winner,
                 "team_1": team_1,
                 "team_2": team_2,
