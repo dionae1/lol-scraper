@@ -13,8 +13,10 @@ class LeagueOfGraphsItem(scrapy.Item):
     winner = scrapy.Field()
     blue_team = scrapy.Field()
     red_team = scrapy.Field()
+    duration = scrapy.Field()
 
 
 class LeagueOfGraphsLoader(ItemLoader):
     match_id_out = TakeFirst()
     winner_out = TakeFirst()
+    duration_out = TakeFirst()

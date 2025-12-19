@@ -22,9 +22,9 @@ class LeagueofgraphsSpider(CrawlSpider):
     }
     rules = (
         # get trough all ranking pages
-        # Rule(
-        #     LinkExtractor(allow=r"/page"),
-        # ),
+        Rule(
+            LinkExtractor(allow=r"/page"),
+        ),
         Rule(
             LinkExtractor(allow=r"/summoner\/kr\/.+"),
             callback="parse_profile",
@@ -57,6 +57,9 @@ class LeagueofgraphsSpider(CrawlSpider):
         result = row.css("div.victoryDefeatText::text").get()
         player_won = result and "Victory" in result
 
+        duration_raw = row.css("div.gameDuration::text").get()
+        duration = duration_raw.strip() if duration_raw else None
+
         player_in_blue = bool(
             row.css("div.summonerColumn:nth-of-type(1) .selected img::attr(title)")
         )
@@ -73,13 +76,18 @@ class LeagueofgraphsSpider(CrawlSpider):
             else:
                 winner = "red" if player_in_blue else "blue"
 
-        blue_team = row.css("div.summonerColumn:nth-of-type(1) img::attr(title)").getall()
-        red_team = row.css("div.summonerColumn:nth-of-type(2) img::attr(title)").getall()
+        blue_team = row.css(
+            "div.summonerColumn:nth-of-type(1) img::attr(title)"
+        ).getall()
+        red_team = row.css(
+            "div.summonerColumn:nth-of-type(2) img::attr(title)"
+        ).getall()
 
         loader = LeagueOfGraphsLoader(item=LeagueOfGraphsItem(), selector=row)
         loader.add_value("match_id", match_id)
         loader.add_value("winner", winner)
         loader.add_value("blue_team", blue_team)
         loader.add_value("red_team", red_team)
+        loader.add_value("duration", duration)
 
         yield loader.load_item()
