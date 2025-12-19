@@ -22,9 +22,9 @@ class LeagueofgraphsSpider(CrawlSpider):
     }
     rules = (
         # get trough all ranking pages
-        # Rule(
-        #     LinkExtractor(allow=r"/page"),
-        # ),
+        Rule(
+            LinkExtractor(allow=r"/page"),
+        ),
         Rule(
             LinkExtractor(allow=r"/summoner\/kr\/.+"),
             callback="parse_profile",
