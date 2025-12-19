@@ -22,6 +22,8 @@ class SQLitePipeline:
                 blue_team
                 TEXT,
                 red_team
+                TEXT,
+                duration
                 TEXT
             )
             """
@@ -31,12 +33,8 @@ class SQLitePipeline:
         adapter = ItemAdapter(item)
 
         match_id = adapter.get("match_id")
-        if isinstance(match_id, list):
-            match_id = match_id[0] if match_id else None
-
         winner = adapter.get("winner")
-        if isinstance(winner, list):
-            winner = winner[0] if winner else None
+        duration = adapter.get("duration")
 
         blue_team = adapter.get("blue_team")
         if isinstance(blue_team, list):
@@ -49,14 +47,15 @@ class SQLitePipeline:
         self.cur.execute(
             """
             INSERT
-            OR IGNORE INTO matches (match_id, winner, blue_team, red_team)
-            VALUES (?, ?, ?, ?)
+            OR IGNORE INTO matches (match_id, winner, blue_team, red_team, duration)
+            VALUES (?, ?, ?, ?, ?)
             """,
             (
                 match_id,
                 winner,
                 blue_team,
                 red_team,
+                duration,
             ),
         )
         self.con.commit()
